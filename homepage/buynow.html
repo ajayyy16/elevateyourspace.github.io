@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buy Now</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    /* Container Box */
+    .container {
+      background: #fff;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      border-radius: 8px;
+    }
+    /* Headings */
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    /* Product Info */
+    p {
+      font-size: 18px;
+      color: #555;
+      margin: 10px 0;
+    }
+    /* Product List */
+    #product-list {
+      list-style: none;
+      padding: 0;
+    }
+    #product-list li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    #product-list img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    #product-list .product-info {
+      flex: 1;
+      text-align: left;
+    }
+    #product-list .product-info h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    #product-list .product-info p {
+      margin: 5px 0;
+      font-size: 16px;
+      color: #555;
+    }
+    /* Button Styling */
+    button {
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+      transition: background 0.3s, transform 0.2s;
+      width: 100%;
+    }
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+    /* Responsive Design */
+    @media screen and (max-width: 480px) {
+      .container {
+        width: 90%;
+        padding: 15px;
+      }
+      h2 {
+        font-size: 22px;
+      }
+      p {
+        font-size: 16px;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Order Confirmation</h2>
+    <ul id="product-list"></ul>
+    <p><strong>Total Quantity:</strong> <span id="total-quantity"></span></p>
+    <p><strong>Total Amount:</strong> ₹ <span id="total-price"></span></p>
+    <button id="proceed-payment">Proceed to Payment</button>
+  </div>
+
+  <!-- Hidden form to send order details (including cart) to payment.php -->
+  <form id="orderForm" action="payment.php" method="POST" style="display:none;">
+    <input type="hidden" name="order_id" id="order_id">
+    <input type="hidden" name="total_amount" id="total_amount">
+    <!-- Container for cart product details -->
+    <div id="cartInputs"></div>
+  </form>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const cartString = localStorage.getItem("cart") || "[]";
+      let cart = JSON.parse(cartString);
+      
+      const productList = document.getElementById("product-list");
+      const totalPriceElement = document.getElementById("total-price");
+      const totalQuantityElement = document.getElementById("total-quantity");
+      const proceedButton = document.getElementById("proceed-payment");
+    
+      let total = 0;
+      let totalQuantity = 0;
+    
+      if (cart.length === 0) {
+        productList.innerHTML = "<p>Your cart is empty. Please add items before proceeding.</p>";
+        proceedButton.disabled = true;
+        proceedButton.style.background = "#ccc";
+      } else {
+        cart.forEach(product => {
+          const listItem = document.createElement("li");
+          const imageSrc = product.image ? product.image : "placeholder.jpg";
+    
+          listItem.innerHTML = `
+            <img src="${imageSrc}" alt="${product.name}">
+            <div class="product-info">
+              <h3>${product.name}</h3>
+              <p>Price: ₹ ${product.price} (Quantity: ${product.quantity})</p>
+            </div>
+          `;
+          productList.appendChild(listItem);
+    
+          total += product.price * product.quantity;
+          totalQuantity += product.quantity;
+        });
+    
+        totalPriceElement.textContent = total.toFixed(2);
+        totalQuantityElement.textContent = totalQuantity;
+      }
+    
+      proceedButton.addEventListener("click", async function() {
+        try {
+          // Check if user is logged in by checking localStorage
+          const userId = localStorage.getItem("user_id");
+          
+          // Verify authentication with server using a GET request to check_auth.php
+          const response = await fetch('check_auth.php', {
+            method: 'GET',
+            credentials: 'same-origin'
+          });
+          const authData = await response.json();
+          
+          if (!authData.authenticated || !userId) {
+            alert("You must be logged in to proceed.");
+            window.location.href = "login.php?redirect=" + encodeURIComponent(window.location.pathname);
+            return;
+          }
+          
+          const totalAmount = parseFloat(totalPriceElement.innerText);
+          if (isNaN(totalAmount) || totalAmount <= 0) {
+            alert("Invalid total amount.");
+            return;
+          }
+          
+          // Generate a unique order ID
+          const orderId = `ORD${Date.now()}`;
+          
+          // Populate the hidden form fields
+          document.getElementById("order_id").value = orderId;
+          document.getElementById("total_amount").value = totalAmount.toFixed(2);
+          
+          // Clear previous cart inputs if any
+          const cartInputs = document.getElementById("cartInputs");
+          cartInputs.innerHTML = "";
+          
+          // Create hidden inputs for each product
+          cart.forEach((product, index) => {
+            const inputName = document.createElement("input");
+            inputName.type = "hidden";
+            inputName.name = `products[${index}][name]`;
+            inputName.value = product.name;
+            cartInputs.appendChild(inputName);
+    
+            const inputPrice = document.createElement("input");
+            inputPrice.type = "hidden";
+            inputPrice.name = `products[${index}][price]`;
+            inputPrice.value = product.price;
+            cartInputs.appendChild(inputPrice);
+    
+            const inputQuantity = document.createElement("input");
+            inputQuantity.type = "hidden";
+            inputQuantity.name = `products[${index}][quantity]`;
+            inputQuantity.value = product.quantity;
+            cartInputs.appendChild(inputQuantity);
+          });
+          
+          // Show a processing bar (simulate delay between 5 and 8 seconds)
+          // You can add a simple processing element here if desired.
+          // For example, we can show an alert or change button text.
+          proceedButton.textContent = "Processing, please wait...";
+          proceedButton.disabled = true;
+          
+          // Calculate a random delay between 5000 and 8000 milliseconds
+          const delay = Math.floor(Math.random() * (8000 - 5000 + 1)) + 5000;
+          setTimeout(() => {
+            window.location.href = `payment.php?order_id=${encodeURIComponent(orderId)}&total=${encodeURIComponent(totalAmount.toFixed(2))}`;
+          }, delay);
+
+          
+        } catch (error) {
+          console.error("Error during payment processing:", error);
+          alert("An error occurred while processing your payment. Please try again.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

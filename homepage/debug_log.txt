@@ -1,0 +1,6 @@
+Array
+(
+    [order_id] => ORD1742574907500
+    [total_amount] => 20499.00
+    [payment_method] => credit-card
+)

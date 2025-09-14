@@ -1,0 +1,310 @@
+<?php
+session_start();
+
+// Database configuration
+$host = 'localhost';
+$db_name = 'furniture_store';
+$username = 'root';
+$password = '';
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $db_name);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Database Connection Failed: " . $conn->connect_error);
+}
+
+// Initialize message variable
+$registerMessage = "";
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
+    $address = trim($_POST['address']);
+    $pincode = trim($_POST['pincode']);
+    $state = trim($_POST['state']);
+    $password = $_POST['password'];
+
+    // Validation
+    if (empty($name) || empty($email) || empty($phone) || empty($address) || empty($pincode) || empty($state) || empty($password)) {
+        $registerMessage = "All fields are required!";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $registerMessage = "Invalid email format!";
+    } elseif (!preg_match('/^[6-9]\d{9}$/', $phone)) {
+        $registerMessage = "Invalid phone number! Must be 10 digits starting with 6-9";
+    } elseif (!preg_match('/^\d{6}$/', $pincode)) {
+        $registerMessage = "Invalid pincode! Must be 6 digits";
+    } elseif (strlen($password) < 8) {
+        $registerMessage = "Password must be at least 8 characters!";
+    } else {
+        // Check if email exists
+        $check_email = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $check_email->bind_param("s", $email);
+        $check_email->execute();
+        $check_email->store_result();
+
+        if ($check_email->num_rows > 0) {
+            $registerMessage = "Email already registered! Try logging in.";
+        } else {
+            // Check if phone exists
+            $check_phone = $conn->prepare("SELECT id FROM users WHERE phone = ?");
+            $check_phone->bind_param("s", $phone);
+            $check_phone->execute();
+            $check_phone->store_result();
+
+            if ($check_phone->num_rows > 0) {
+                $registerMessage = "Phone number already registered!";
+            } else {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                // Insert new user
+                $query = "INSERT INTO users (name, email, phone, address, pincode, state, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($query);
+                if (!$stmt) {
+                    die("Error preparing SQL statement: " . $conn->error);
+                }
+                $stmt->bind_param("sssssss", $name, $email, $phone, $address, $pincode, $state, $hashed_password);
+
+                if ($stmt->execute()) {
+                    // Get the newly created user ID
+                    $user_id = $stmt->insert_id;
+                    
+                    // Set session variables
+                    $_SESSION['user_id'] = $user_id;
+                    $_SESSION['email'] = $email;
+                    $_SESSION['name'] = $name;
+                    
+                    $registerMessage = "Registration successful! Redirecting to dashboard...";
+                    echo "<script>
+                            setTimeout(function() {
+                                window.location.href = 'dashboard.php';
+                            }, 1500);
+                          </script>";
+                } else {
+                    $registerMessage = "Error: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+            $check_phone->close();
+        }
+        $check_email->close();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Furniture Store</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background: url('https://plus.unsplash.com/premium_photo-1681412205156-bb506a4ea970?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGhvbWUlMjBkZWNvcnxlbnwwfHwwfHx8MA%3D%3D') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        /* Container */
+        .register-container {
+            display: flex;
+            width: 80%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            justify-content: space-between;
+            gap: 20px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .register-container:hover {
+            transform: scale(1.02);
+        }
+
+        /* Form Sections */
+        .left-section, .right-section {
+            width: 48%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 25px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #7b1fa2;
+            box-shadow: 0 0 8px rgba(123, 31, 162, 0.3);
+            outline: none;
+        }
+
+        /* Button Styling */
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            background-color: #7b1fa2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .register-btn:hover {
+            background-color: #512da8;
+            transform: translateY(-2px);
+        }
+
+        /* Message Styling */
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            color: #28a745;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Divider */
+        .divider {
+            height: auto;
+            width: 2px;
+            background: #ddd;
+            margin: 0 15px;
+        }
+
+        /* Login Link */
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-link a {
+            color: #7b1fa2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .register-container {
+                flex-direction: column;
+                width: 90%;
+                padding: 30px;
+            }
+
+            .left-section, .right-section {
+                width: 100%;
+            }
+
+            .divider {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="left-section">
+            <h2>Personal Information</h2>
+            <form action="register.php" method="POST">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter 10-digit phone number" required value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" placeholder="Enter your address" required value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
+                </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="right-section">
+            <h2>Security Details</h2>
+                <div class="form-group">
+                    <label for="pincode">Pincode</label>
+                    <input type="text" id="pincode" name="pincode" placeholder="Enter 6-digit pincode" required value="<?php echo isset($_POST['pincode']) ? htmlspecialchars($_POST['pincode']) : ''; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" placeholder="Enter your state" required value="<?php echo isset($_POST['state']) ? htmlspecialchars($_POST['state']) : ''; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter at least 8 characters" required>
+                </div>
+                <button type="submit" class="register-btn">Register</button>
+                <div class="login-link">
+                    Already have an account? <a href="login.php">Login</a>
+                </div>
+            </form>
+            <?php if (!empty($registerMessage)): ?>
+                <div class="message <?php echo strpos($registerMessage, 'successful') !== false ? 'success' : 'error'; ?>">
+                    <?php echo htmlspecialchars($registerMessage); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</body>
+</html>

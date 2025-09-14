@@ -1,0 +1,22 @@
+<?php
+session_start();
+$conn = new mysqli('localhost', 'root', '', 'furniture_store');
+
+if ($conn->connect_error) {
+    die(json_encode(["success" => false, "message" => "Database Connection Failed"]));
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $cart_id = $_POST['cart_id'];
+
+    $query = "DELETE FROM cart WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $cart_id);
+    $stmt->execute();
+    $stmt->close();
+
+    echo json_encode(["success" => true]);
+}
+
+$conn->close();
+?>
