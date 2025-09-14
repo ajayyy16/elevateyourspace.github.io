@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage - Elevate Your Space</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../style/global.css">
+  <link rel="stylesheet" href="../style/homepage.css">
+  <link rel="stylesheet" href="../style/navbar.css">  
+  <link rel="stylesheet" href="../style/footer.css"> 
+  <link rel="stylesheet" href="../style/section.css">
+  <link rel="stylesheet" href="../homepage/homepage.js">
+  <style>
+    /* Add any additional styles here */.hero-section {
+    text-align: center;
+    background: #ffffff;
+    padding: 50px 20px;
+  }
+  
+  .hero-section h1 {
+    font-size: 3rem;
+    color: #ffffff;
+  }
+  
+  .hero-section p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+  }
+  
+  .hero-section button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .hero-section button:hover {
+    background-color: #0056b3;
+  }
+
+/* General Styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 15px 20px;
+}
+
+.logo {
+  color: rgb(0, 0, 0);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-links li {
+  margin: 0 15px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  font-size: 18px;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar-links a:hover {
+  color: #f8b400;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-links {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background: #333;
+      text-align: center;
+      padding: 15px 0;
+  }
+
+  .navbar-links.active {
+      display: flex;
+  }
+
+  .navbar-links li {
+      margin: 10px 0;
+  }
+
+  .hamburger-menu {
+      display: block;
+  }
+}
+
+
+  /* Hero Section Styling */
+.hero-section {
+  background-image: url('https://img.freepik.com/premium-photo/illustration-living-room-interior_252025-214883.jpg?semt=ais_hybrid'); /* Replace with the actual path to your image */
+  background-size: cover; /* Ensures the image covers the entire section */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents repeating the image */
+  height: 400px; /* Adjust the height based on your design */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white; /* Text color for contrast */
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4); /* Adds a subtle overlay for better readability */
+}
+
+/* Heading Styling */
+.hero-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Paragraph Styling */
+.hero-section p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Button Styling */
+.hero-section button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.hero-section button:hover {
+  background-color: #0056b3;
+}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <nav class="navbar">
+    <div class="logo">ElevateYourSpace</div>
+    <ul class="navbar-links">
+        <li><a href="../homepage/homepage.php">Home</a></li>
+        <li><a href="./shop.php">Shop</a></li>
+        <li><a href="../homepage/about.html">About Us</a></li>
+        <li><a href="../homepage/contact.html">Contact</a></li>
+        <?php if(isset($_SESSION['user_id'])): ?>
+            <li><a href="../homepage/logout.php">Logout</a></li>
+          <?php else: ?>
+            <li><a href="../homepage/login.php">Login</a></li>
+          <?php endif; ?>
+        <li><a href="../homepage/addtocart.html" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </a></li>
+        <?php if(isset($_SESSION['user_id'])): ?>
+            <li><a href="../homepage/profile.php" class="profile-icon">
+              <i class="fas fa-user"></i>
+            </a></li>
+          <?php endif; ?>
+    </ul>
+    <button class="hamburger-menu" onclick="toggleNavbar()">☰</button>
+</nav>
+
+    <script>
+        function toggleNavbar() {
+            document.querySelector('.navbar-links').classList.toggle('active');
+        }
+    </script>
+    </header>
+
+    <section class="hero-section">
+    <?php if(isset($_SESSION['user_name'])): ?>
+        <h1>Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h1>
+      <?php else: ?>
+        <h1>Elevate Your Living Space</h1>
+      <?php endif; ?>     
+    <p>Discover the perfect pieces to transform your home.</p>
+      <div class="navbar-search">
+        <input type="text" id="searchInput" placeholder="What are you looking for?" />
+        <button type="submit" onclick="redirectToShop()">Search</button>
+      </div>
+      
+      <script>
+        function redirectToShop() {
+          const query = document.getElementById("searchInput").value;
+          if (query) {    
+            window.location.href = `shop.php?search=${encodeURIComponent(query)}`;
+          } else {
+            window.location.href = "shop.php";
+          }
+        }
+      </script>
+    </section>
+
+    <section id="products">
+      <h2>Featured Products</h2>
+      <div class="product-slider">
+          <div class="product-grid">
+              <div class="product-card">
+                  <img src="../assets/images/modernsofa.jpg" 
+                       alt="Modern Sofa - A stylish modern sofa in a living room setting">
+                  <h3>Modern Sofa</h3>
+                  <p>Rs 4,999</p>
+                  <button class="add-to-cart" data-product-id="1" data-product-name="Modern Sofa" data-product-price="4999">Add to Cart</button>
+                </div>
+              <div class="product-card">
+                  <img src="../assets/images/diningtable.jpg" 
+                       alt="Wooden Dining Table - A beautifully crafted wooden dining table">
+                  <h3>Wooden Dining Table</h3>
+                  <p>Rs 9,999</p>
+                  <button class="add-to-cart" data-product-id="2" data-product-name="Wooden Dining Table" data-product-price="9999">Add to Cart</button>
+              </div>
+              <div class="product-card">
+                  <img src="../assets/images/leatherarmchair.jpg" 
+                       alt="Leather Armchair - A luxurious leather armchair">
+                  <h3>Leather Armchair</h3>
+                  <p>Rs 20,000</p>
+                  <button class="add-to-cart" data-product-id="3"data-product-name="Leather Armchair" data-product-price="20000">Add to Cart
+                  </div>
+              <div class="product-card">
+                <img src="../assets/images/coffeetable.jpg"
+                alt="Modern Coffee Table - A sleek modern coffee table">
+                  <h3>Modern Coffee Table</h3>
+                  <p>Rs 1,500</p>
+                  <button class="add-to-cart" data-product-id="4"data-product-name="Modern Coffee Table"data-product-price="1500">Add to Cart</button>
+                </div>
+              <div class="product-card">
+                  <img src="../assets/images/wardrobe.jpg" 
+                       alt="Wardrobe - A spacious modern wardrobe">
+                  <h3>Wardrobe</h3>
+                  <p>Rs 16,999</p>
+                  <button class="add-to-cart" data-product-id="5"data-product-name="Wardrobe" data-product-price="16999">Add to Cart</button>
+                </div>
+              <div class="product-card">
+                  <img src="../assets/images/tvunit.png" 
+                       alt="TV Unit - A modern TV unit with storage">
+                  <h3>TV Unit</h3>
+                  <p>Rs 12,999</p>
+                  <button class="add-to-cart" data-product-id="6"data-product-name="TV Unit" data-product-price="12999">Add to Cart</button>
+                </div>
+              <div class="product-card">
+                <img src="../assets/images/armlesschair.png" 
+                     alt="Armless Office Chair">
+                <h3>Armless Office Chair</h3>
+                <p>Rs 3,500</p>
+                <button class="add-to-cart" data-product-id="7" data-product-name="Armless Office Chair" data-product-price="3500">Add to Cart</button>
+              </div>
+          </div>
+      </div>
+  </section>
+  <script>
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+  button.addEventListener("click", function() {
+      const productId = this.getAttribute("data-product-id");
+      const productName = this.getAttribute("data-product-name");
+      const productPrice = parseFloat(this.getAttribute("data-product-price"));
+      const productImage = this.parentElement.querySelector("img").src; // Get product image URL
+
+      // Load existing cart
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // Check if the product is already in the cart
+      const existingProductIndex = cart.findIndex(item => item.id === productId);
+
+      if (existingProductIndex > -1) {
+          // If the product exists, increase the quantity (optional)
+          cart[existingProductIndex].quantity += 1;
+      } else {
+          // If the product does not exist, add it with a quantity of 1
+          cart.push({ id: productId, name: productName, price: productPrice, image: productImage, quantity: 1 });
+      }
+
+      // Save updated cart to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+      // Show pop-up message (optional)
+      alert(`${productName} has been added to your cart!`);
+  });
+});
+  </script>
+
+<section class="bestseller-section">
+  <h2>Bestseller Products</h2>
+  <div class="bestseller-row">
+      <div class="bestseller-product">
+          <img src="https://media.istockphoto.com/id/1190440285/photo/eclectic-living-room-interior-with-comfortable-velvet-corner-sofa-with-pillows.jpg?s=612x612&w=0&k=20&c=T87OfLSfrChREiVaDLJA4LIM2qvrc7UaosmxH75RY98=" alt="Bestseller Product" />
+          <div class="bestseller-details">
+              <h3>Luxury Velvet Sofa</h3>
+              <p>Experience ultimate comfort with our premium velvet sofa. Perfect for modern living spaces.</p>
+              <span class="bestseller-price">Rs 25,000</span>
+              <button class="bestseller-add-to-cart" data-product-id="101" data-product-name="Luxury Velvet Sofa" data-product-price="25000">Add to Cart</button>
+          </div>
+      </div>
+      <div class="bestseller-product">
+          <img src="https://media.istockphoto.com/id/1009381622/photo/stylish-light-gray-handles-on-cabinets-close-up-kitchen-interior-with-modern-furniture-and.jpg?s=612x612&w=0&k=20&c=4NQ3m2g95BvLVTAOSutoVnkq3xtvkHuSTzP45ICDXMY=" alt="Bestseller Product" />
+          <div class="bestseller-details">
+              <h3>Kitchen Cabinet</h3>
+              <p>A cupboard with drawers and shelves for use in a kitchen</p>
+              <span class="bestseller-price">Rs 49,000</span>
+              <button class="bestseller-add-to-cart" data-product-id="102" data-product-name="Kitchen Cabinet" data-product-price="49000">Add to Cart</button>
+          </div>
+      </div>
+      <div class="bestseller-product">
+          <img src="https://media.istockphoto.com/id/1217867447/photo/lamps-over-the-table.jpg?s=612x612&w=0&k=20&c=V1xWg4tARyzObdzlrKnGjxeC7yXySDXIMLlF_8iUzBI=" alt="Bestseller Product" />
+          <div class="bestseller-details">
+              <h3>Table Lamp</h3>
+              <p>A small electric light designed to stand on a table or any piece of furniture</p>
+              <span class="bestseller-price">Rs 10,000</span>
+              <button class="bestseller-add-to-cart" data-product-id="103" data-product-name="Table Lamp" data-product-price="10000">Add to Cart</button>
+          </div>
+      </div>
+  </div>
+</section>
+<script>
+  // Add event listeners to all "Add to Cart" buttons
+document.querySelectorAll(".bestseller-add-to-cart").forEach(button => {
+    button.addEventListener("click", function() {
+        const productId = this.getAttribute("data-product-id");
+        const productName = this.getAttribute("data-product-name");
+        const productPrice = parseFloat(this.getAttribute("data-product-price"));
+        const productImage = this.parentElement.parentElement.querySelector("img").src; // Get product image URL
+
+        // Load existing cart
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Check if the product is already in the cart
+        const existingProductIndex = cart.findIndex(item => item.id === productId );
+
+        if (existingProductIndex > -1) {
+            // If the product exists, increase the quantity
+            cart[existingProductIndex].quantity += 1;
+        } else {
+            // If the product does not exist, add it with a quantity of 1
+            cart.push({ id: productId, name: productName, price: productPrice, image: productImage, quantity: 1 });
+        }
+
+        // Save updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Show pop-up message
+        alert(`${productName} has been added to your cart!`);
+    });
+});
+</script>
+
+    <section class="image-gallery">
+      <h2>Idea & Inspiration</h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Item 1">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.pexels.com/photos/1543447/pexels-photo-1543447.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Item 2">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.pexels.com/photos/3767442/pexels-photo-3767442.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Item 3">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.pexels.com/photos/462235/pexels-photo-462235.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Item 4">
+        </div>
+        <div class="gallery-item">
+          <img src="https://img.freepik.com/free-photo/decorative-pom-poms-used-decorative-vase_23-2149449983.jpg?ga=GA1.1.1234046264.1736790752&semt=ais_hybrid" alt="Item 5">
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.pexels.com/photos/3797991/pexels-photo-3797991.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Item 6">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/2y5I5BAbDAaUWeQ3ZGrw4Uc__7tTF-XopraQUuolYMQ/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTQx/MTYwNTgyOC9waG90/by9tb2Rlcm4tZWxl/Z2FudC1raXRjaGVu/LXN0b2NrLXBob3Rv/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz1tNlVwMWppTWdj/QUNRZG5Jb0NSQW51/NHRvd25jVkdYTndj/Qi15bURLWFRFPQ" alt="Item 7">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/4go9GYjZdGQiAHRef9_2-YmQ5osaytU4s4qMNfg_XwY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzBjL2Rm/LzNhLzBjZGYzYTBi/ZjY0MGUyYjZjMWRl/MmQyZGJkOGMwNGM4/LmpwZw" alt="Item 8">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/yDYnXAkPDjb6hg12NCztdL40j0kDN8oraeXLhvfa2Jk/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9oaXBz/LmhlYXJzdGFwcHMu/Y29tL2htZy1wcm9k/L2ltYWdlcy9tZGkt/bHV4dXJ5LWRlc2ln/bi1qdWxpYS1seW5u/LXBob3RvZ3JhcGh5/LTMtNjY3OWIzNzk3/ZWQ5NC5qcGc_Y3Jv/cD0xeHc6MXhoO2Nl/bnRlcix0b3AmcmVz/aXplPTk4MDoq" alt="Item 9">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/PJ0M4jWhGSN8c7ah1M3MM-AkZiYsRoW6RbacxoHY91Y/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9qdWd5/YWgtZGV2LXByb3Bl/cnR5LXBob3Rvcy5z/My5hcC1zb3V0aC0x/LmFtYXpvbmF3cy5j/b20vZmFsc2VfY2Vp/bGluZ19kZXNpZ25f/MDdfYjk4YTczMjJi/NC53ZWJw" alt="Item 10">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/uO5aW84-x8uWIf0jXYdKr4tw6F3IdMO8KgjEIa_ffxM/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pNS53/YWxtYXJ0aW1hZ2Vz/LmNvbS9zZW8vTGFu/ZHNjYXBlLUhvbWUt/RGVjb3ItV2FsbC1B/cnQtQmxvc3NvbS1Q/aWN0dXJlLVByaW50/LTI0LXg0OC1Xb21l/bi1Sb29tLURlY29y/LWZvci1CZWRyb29t/LUJvdGFuaWNhbC1M/YXJnZS1QYWludGlu/Zy1Qb3N0ZXJzLWZv/ci1PZmZpY2VfODBh/MzM1NjEtZjU1ZS00/N2JkLWI1MzAtM2Jj/ODM5OGIxY2RhLjkx/MmU3YzIzNzI0NmRm/ZjY2ZDU4ZTE4MTM0/Nzk0Y2ZmLmpwZWc_/b2RuSGVpZ2h0PTU4/MCZvZG5XaWR0aD01/ODAmb2RuQmc9RkZG/RkZG" alt="Item 11">
+        </div>
+        <div class="gallery-item">
+          <img src="https://imgs.search.brave.com/tqx26SPZ7S_2OcVJH23OpCMvLjHtVxC_Azc4ZfY84OU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ub3Jk/aWN3YWxsYXJ0LmNv/bS9jZG4vc2hvcC9m/aWxlcy9BbGllblNr/eVdhbGxBcnRGaW5l/QXJ0Q2FudmFzUHJp/bnRzVmVydGljYWxG/b3JtYXRQaWN0dXJl/c0ZvckVudHJhbmNl/SGFsbHdheUhvbWVP/ZmZpY2VIb3RlbFJv/b21BcnREZWNvcjIw/MjQwMDVfZjJiYzY0/ZGYtNWQwYS00MGYz/LTkwYTQtZDI1ZWU2/MGFiNGQ2LmpwZz92/PTE2OTcwMjY5ODMm/d2lkdGg9NTMz" alt="Item 12">
+        </div>
+      </div>
+    </section>
+
+    <section class="services-section">
+      <h2>Our Services</h2>
+      <div class="services-container">
+        <!-- Left Section -->
+        <div class="services-discover">
+          <h2>Discover all the services</h2>
+          <div class="discover-arrow">
+            <span>&rarr;</span>
+          </div>
+        </div>
+    
+        <!-- Right Section: Service Cards -->
+        <div class="services-cards">
+          <div class="service-card">
+            <img src="https://www.ikea.com/images/11/13/111321124743e2b0d6adbc6c306df96a.png?f=s" alt="Service 1 Icon">
+            <p>Post Office Collection Point</p>
+          </div>
+          <div class="service-card">
+            <img src="https://www.ikea.com/images/clicca-e-ritira-a46e5addce741cf77f2666dc277e267f.png?f=s" alt="Service 2 Icon">
+            <p>Click & Collect for Rs.499</p>
+          </div>
+          <div class="service-card">
+            <img src="https://www.ikea.com/images/progetta-con-noi-in-videoconferenza-6e8476be4c3f85e2b623dfd7e0cbb66c.png?f=s" alt="Service 3 Icon">
+            <p>Design Service</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    
+    
+    <footer class="footer">
+        <div class="footer-container">
+          <!-- About Section -->
+          <div class="footer-about">
+            <h3>Elevate Your Space</h3>
+            <p>Your one-stop destination for premium home decor and furniture.<br> 
+                Transform your living spaces with elegance and style.
+            </p>
+          </div>
+      
+          <!-- Contact Section -->
+          <div class="footer-contact">
+            <h4>Contact Us</h4>
+            <ul>
+              <li>Email: support@elevateyourspace.com</li><br>
+              <li>Phone: (+91) 12349-56780</li><br>
+              <li>Address: 123 Furniture Street , Bangalore, Karnataka 560001</li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="footer-bottom">
+          <p>&copy; 2025 Elevate Your Space. All rights reserved.</p>
+          <ul class="footer-socials">
+            <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+            <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+            <li><a href="#"><i class="fab fa-pinterest"></i> Pinterest</a></li>
+          </ul>
+        </div>
+      </footer>
+      
+  </div>
+</body>
+</html>
