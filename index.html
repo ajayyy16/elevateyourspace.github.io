@@ -840,20 +840,20 @@ body {
       <nav class="navbar">
     <div class="logo">ElevateYourSpace</div>
     <ul class="navbar-links">
-        <li><a href="../homepage/homepage.php">Home</a></li>
-        <li><a href="./shop.php">Shop</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="./shop.html">Shop</a></li>
         <li><a href="../homepage/about.html">About Us</a></li>
         <li><a href="../homepage/contact.html">Contact</a></li>
         <?php if(isset($_SESSION['user_id'])): ?>
-            <li><a href="../homepage/logout.php">Logout</a></li>
+            <li><a href="../homepage/logout.html">Logout</a></li>
           <?php else: ?>
-            <li><a href="../homepage/login.php">Login</a></li>
+            <li><a href="../homepage/login.html">Login</a></li>
           <?php endif; ?>
         <li><a href="../homepage/addtocart.html" class="cart-icon">
             <i class="fas fa-shopping-cart"></i>
         </a></li>
         <?php if(isset($_SESSION['user_id'])): ?>
-            <li><a href="../homepage/profile.php" class="profile-icon">
+            <li><a href="../homepage/profile.html" class="profile-icon">
               <i class="fas fa-user"></i>
             </a></li>
           <?php endif; ?>
@@ -1151,3 +1151,4 @@ document.querySelectorAll(".bestseller-add-to-cart").forEach(button => {
   </div>
 </body>
 </html>
+
