@@ -1,0 +1,156 @@
+.hero-section {
+    text-align: center;
+    background: #ffffff;
+    padding: 50px 20px;
+  }
+  
+  .hero-section h1 {
+    font-size: 3rem;
+    color: #ffffff;
+  }
+  
+  .hero-section p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+  }
+  
+  .hero-section button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .hero-section button:hover {
+    background-color: #0056b3;
+  }
+
+/* General Styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 15px 20px;
+}
+
+.logo {
+  color: rgb(0, 0, 0);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-links li {
+  margin: 0 15px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  font-size: 18px;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar-links a:hover {
+  color: #f8b400;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-links {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background: #333;
+      text-align: center;
+      padding: 15px 0;
+  }
+
+  .navbar-links.active {
+      display: flex;
+  }
+
+  .navbar-links li {
+      margin: 10px 0;
+  }
+
+  .hamburger-menu {
+      display: block;
+  }
+}
+
+
+  /* Hero Section Styling */
+.hero-section {
+  background-image: url('https://img.freepik.com/premium-photo/illustration-living-room-interior_252025-214883.jpg?semt=ais_hybrid'); /* Replace with the actual path to your image */
+  background-size: cover; /* Ensures the image covers the entire section */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents repeating the image */
+  height: 400px; /* Adjust the height based on your design */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white; /* Text color for contrast */
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4); /* Adds a subtle overlay for better readability */
+}
+
+/* Heading Styling */
+.hero-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Paragraph Styling */
+.hero-section p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Button Styling */
+.hero-section button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.hero-section button:hover {
+  background-color: #0056b3;
+}

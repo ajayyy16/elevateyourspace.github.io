@@ -1,0 +1,36 @@
+<?php
+$host = 'localhost';
+$db_name = 'furniture_store';
+$username = 'root';
+$password = '';
+
+// Connect to MySQL
+$conn = new mysqli($host, $username, $password, $db_name);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Database Connection Failed: " . $conn->connect_error);
+}
+
+// Fetch products from database
+$query = "SELECT * FROM products";
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    echo '<div id="product-list">';
+    while ($row = $result->fetch_assoc()) {
+        echo '<div class="product">
+                <img src="' . htmlspecialchars($row["image_url"]) . '" alt="' . htmlspecialchars($row["name"]) . '">
+                <h3>' . htmlspecialchars($row["name"]) . '</h3>
+                <p>Rs ' . number_format($row["price"], 2) . '</p>
+                <button class="buy-now" data-product-id="' . $row["id"] . '" data-product-name="' . htmlspecialchars($row["name"]) . '" data-product-price="' . $row["price"] . '">Buy Now</button>
+                <button class="add-to-cart" data-product-id="' . $row["id"] . '" data-product-name="' . htmlspecialchars($row["name"]) . '" data-product-price="' . $row["price"] . '">Add to Cart</button>
+              </div>';
+    }
+    echo '</div>';
+} else {
+    echo "<p>No products available.</p>";
+}
+
+$conn->close();
+?>

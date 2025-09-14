@@ -1,0 +1,147 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Database Connection
+$conn = new mysqli('localhost', 'root', '', 'furniture_store');
+
+// Check for connection errors
+if ($conn->connect_error) {
+    die("<script>alert('Database Connection Failed: " . $conn->connect_error . "'); window.location.href='login.php';</script>");
+}
+
+// Get user's orders from database
+$query = "SELECT o.*, 
+          (SELECT COUNT(*) FROM order_items WHERE order_id = o.order_id) AS item_count
+          FROM orders o
+          WHERE o.user_id = ?
+          ORDER BY o.created_at DESC";
+
+$stmt = $conn->prepare($query);
+if (!$stmt) {
+    die("<script>alert('Database Error: " . $conn->error . "'); window.location.href='homepage.php';</script>");
+}
+
+$stmt->bind_param("i", $_SESSION['user_id']);
+if (!$stmt->execute()) {
+    die("<script>alert('Error fetching orders: " . $stmt->error . "'); window.location.href='homepage.php';</script>");
+}
+
+$result = $stmt->get_result();
+$orders = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .order-id {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .order-date {
+            color: #7f8c8d;
+        }
+        .order-status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .status-completed, .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending, .status-processing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-cancelled, .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Orders</h1>
+        
+        <?php if (empty($orders)): ?>
+            <p>You haven't placed any orders yet.</p>
+            <a href="shop.php" class="btn">Start Shopping</a>
+        <?php else: ?>
+            <div class="orders-list">
+                <?php foreach ($orders as $order): ?>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">Order #<?= htmlspecialchars($order['order_id']) ?></span>
+                            <?php if (isset($order['created_at'])): ?>
+                                <span class="order-date"><?= date('M j, Y', strtotime($order['created_at'])) ?></span>
+                            <?php endif; ?>
+                            <span class="order-status status-<?= $order['status'] ?>"><?= ucfirst($order['status']) ?></span>
+                        </div>
+                        <div class="order-body">
+                            <p><strong>Total:</strong> ₹<?= number_format($order['total_amount'], 2) ?></p>
+                            <?php if (isset($order['payment_method'])): ?>
+                                <p><strong>Payment Method:</strong> <?= ucfirst(str_replace('-', ' ', $order['payment_method'])) ?></p>
+                            <?php endif; ?>
+                            <p><strong>Items:</strong> <?= $order['item_count'] ?></p>
+                            <a href="order_details.php?order_id=<?= $order['order_id'] ?>" class="btn">View Details</a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Database connection
+$host = 'localhost';
+$db_name = 'furniture_store';
+$username = 'root';
+$password = '';
+$conn = new mysqli($host, $username, $password, $db_name);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Database Connection Failed: " . $conn->connect_error);
+}
+
+// Fetch user details
+$user_id = $_SESSION['user_id'];
+$query = "SELECT name, email, created_at FROM users WHERE id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$stmt->bind_result($name, $email, $created_at);
+$stmt->fetch();
+$stmt->close();
+
+// Fetch order history from payment_details table
+$orders = [];
+// NOTE: This query assumes that your payment_details table has a user_id column.
+$order_query = "SELECT order_id, total_amount, payment_method, created_at FROM payment_details WHERE id = ?";
+$order_stmt = $conn->prepare($order_query);
+$order_stmt->bind_param("i", $user_id);
+$order_stmt->execute();
+$result = $order_stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $orders[] = $row;
+}
+$order_stmt->close();
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Elevate Your Space</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Profile Section */
+        .profile-container {
+            width: 100%;
+            background: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        /* Orders Section */
+        .orders-container {
+            flex: 1;
+            width: 100%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .orders-container h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .orders-table th, .orders-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .orders-table th {
+            background: #007BFF;
+            color: white;
+        }
+
+        .orders-table tr:hover {
+            background: #f1f1f1;
+        }
+
+        /* Buttons */
+        .btn-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            margin: 5px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            color: white;
+            display: inline-block;
+        }
+
+        .home-btn {
+            background: #28a745;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .profile-container {
+                font-size: 16px;
+                padding: 15px;
+            }
+
+            .orders-table th, .orders-table td {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 16px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- User Profile -->
+    <div class="profile-container">
+        <p>
+            <strong>Name:</strong> <?php echo htmlspecialchars($name); ?> &nbsp; | &nbsp; 
+            <strong>Email:</strong> <?php echo htmlspecialchars($email); ?> &nbsp; | &nbsp; 
+            <strong>Member Since:</strong> <?php echo date("d M Y", strtotime($created_at)); ?>
+        </p>
+    </div>
+
+    <!-- Order History -->
+    <div class="orders-container">
+        <h2>Your Orders</h2>
+        <?php if (!empty($orders)) : ?>
+            <table class="orders-table">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Total Price (₹)</th>
+                    <th>Payment Method</th>
+                    <th>Date</th>
+                </tr>
+                <?php foreach ($orders as $order) : ?>
+                    <tr>
+                        <td>#<?php echo htmlspecialchars($order['order_id']); ?></td>
+                        <td>₹<?php echo number_format($order['total_amount'], 2); ?></td>
+                        <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
+                        <td><?php echo date("d M Y", strtotime($order['created_at'])); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php else : ?>
+            <p style="text-align:center;">No orders found.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-container">
+        <a href="homepage.php" class="btn home-btn">Back to Homepage</a>
+        <a href="logout.php" class="btn logout-btn">Logout</a>
+    </div>
+</body>
+</html>

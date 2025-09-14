@@ -1,0 +1,94 @@
+/* Reset some default styles */
+body, h2, p {
+    margin: 0;
+    padding: 10px;
+}
+
+/* General body styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #756cc9; /* Light background color */
+    color: #333; /* Dark text color */
+}
+
+/* About section styles */
+.about-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff; /* White background for the section */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin: 30px; /* Margin around the section */
+    border-radius: 8px; /* Rounded corners */
+}
+
+/* Container for the content */
+.about-container {
+    display: flex;
+    max-width: 1200px; /* Maximum width for the container */
+    width: 100%; /* Full width */
+    margin: 10px 10px; /* Center the container */
+}
+
+/* Image styles */
+.about-image {
+    flex: 1; /* Take up equal space */
+    padding: 10px; /* Padding around the image */
+}
+
+.about-image img {
+    max-width: 100%; /* Responsive image */
+    border-radius: 8px; /* Rounded corners for the image */
+}
+
+/* Content styles */
+.about-content {
+    flex: 1; /* Take up equal space */
+    padding: 10px; /* Padding around the content */
+    text-align: center; /* Center align the content */
+    margin-left: 50px; /* Space on the left side */
+}
+
+.about-content h2 {
+    font-size: 2em; /* Larger font size for the heading */
+    margin-bottom: 14px; /* Space below the heading */
+    margin-left: 10px; /* Space on the left side */
+}
+
+.about-content p {
+    margin-bottom: 14px; /* Space below each paragraph */
+}
+
+/* Button styles */
+.about-btn {
+    display: inline-block; /* Make the link look like a button */
+    padding: 10px 20px; /* Padding for the button */
+    background-color: #007BFF; /* Button background color */
+    color: #fff; /* Button text color */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Rounded corners for the button */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.about-btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+@media screen and (max-width: 768px) {
+    .about-container {
+        flex-direction: column; /* Stack columns on smaller screens */
+        text-align: center; /* Center align the content */
+        grid-template-columns: 1fr; /* Two columns on smaller screens */
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .about-content {
+        flex-direction: column; /* Stack columns on smaller screens */
+        text-align: center; /* Center align the content */
+        margin-left: auto;
+        grid-template-columns: 1fr; /* Two columns on smaller screens */
+    }
+  }

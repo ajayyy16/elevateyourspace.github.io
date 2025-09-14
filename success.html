@@ -1,0 +1,280 @@
+<?php
+session_start();
+
+// Check if payment was successful and total amount is available
+if (!isset($_GET['total'])) {
+    die("Invalid request. Total amount is required.");
+}
+
+$totalAmount = htmlspecialchars($_GET['total']);
+
+// Prevent resubmission on refresh by setting a session flag
+if (!isset($_SESSION['order_submitted'])) {
+    $_SESSION['order_submitted'] = true;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      color: #28a745;
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      animation: slideIn 0.5s ease-in-out;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    p {
+      font-size: 1.1rem;
+      color: #555;
+      margin: 10px 0;
+    }
+    .order-summary {
+      margin-top: 20px;
+      text-align: left;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .order-summary h2 {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .order-summary p {
+      font-size: 1.1rem;
+      color: #555;
+      margin: 5px 0;
+    }
+    .product-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .product-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+    }
+    .product-list img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    .product-info h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .product-info p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    button {
+      padding: 12px 24px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.3s ease, transform 0.2s ease;
+      flex: 1;
+      max-width: 200px;
+    }
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .order-summary h2 {
+        font-size: 1.5rem;
+      }
+      .button-container {
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Thank You!</h1>
+    <p>Your payment has been successfully processed.</p>
+    <p>We appreciate your business!</p>
+
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      <p><strong>Total Amount:</strong> <span id="total-amount">₹<?= $totalAmount ?></span></p>      
+      <h3>Products:</h3>
+      <ul class="product-list" id="product-list">
+        <!-- Product list will be populated here by JavaScript -->
+      </ul>
+    </div>
+
+    <div class="button-container">
+      <button onclick="goHome()">Go to Home</button>
+      <button onclick="goOrder()">View Orders</button>
+      <button onclick="downloadInvoice()">Download Invoice</button>
+      <script> 
+      function goHome() {
+        window.location.href = "homepage.php"; 
+      }
+      function goOrder() { 
+        window.location.href = "profile.php"; 
+      }
+      function downloadInvoice() {
+        window.location.href = "invoice.php"; 
+      }
+      </script>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Retrieve the cart from localStorage
+        const cartString = localStorage.getItem("cart") || "[]"; // Use sessionStorage if needed
+        let cart = JSON.parse(cartString); // Parse the JSON string into an array
+
+        const productList = document.getElementById("product-list"); // The element where products will be displayed
+        let total = 0;
+        let totalQuantity = 0;
+
+        // Check if the cart is empty
+        if (cart.length === 0) {
+            productList.innerHTML = "<li>No products found in your cart.</li>";
+        } else {
+            // Loop through each product in the cart
+            cart.forEach(product => {
+                const listItem = document.createElement("li");
+                const imageSrc = product.image ? product.image : "placeholder.jpg"; // Use a placeholder if no image
+
+                listItem.innerHTML = `
+                    <img src="${imageSrc}" alt="${product.name}">
+                    <div class="product-info">
+                        <h3>${htmlspecialchars(product.name)}</h3>
+                        <p>Price: ₹ ${htmlspecialchars(product.price)} (Quantity: ${htmlspecialchars(product.quantity)})</p>
+                    </div>
+                `;
+                productList.appendChild(listItem); // Append the product to the list
+
+                total += product.price * product.quantity; // Calculate total price
+                totalQuantity += product.quantity; // Calculate total quantity
+            });
+
+            // Display total price and quantity
+            document.getElementById("total-price").textContent = `Total Amount: ₹ ${total.toFixed(2)}`; // Format total price to 2 decimal places
+            document.getElementById("total-quantity").textContent = `Total Quantity: ${totalQuantity}`; // Display total quantity
+        }
+    });
+
+    // Function to escape HTML characters
+    function htmlspecialchars(string) {
+        const div = document.createElement('div');
+        div.innerText = string; // Set the text content to escape HTML
+        return div.innerHTML; // Return the escaped HTML
+    }
+    function downloadInvoice() {
+    // Get cart data from localStorage
+    const cart = JSON.parse(localStorage.getItem("cart") || []);
+    
+    // Get total amount - using the correct element ID
+    const totalElement = document.getElementById("total-amount");
+    if (!totalElement) {
+        console.error("Total amount element not found");
+        alert("Could not generate invoice. Missing order information.");
+        return;
+    }
+    
+    // Extract just the numeric value (remove ₹ symbol)
+    const total = parseFloat(totalElement.textContent.replace(/[^0-9.]/g, ''));
+    
+    // Get order ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id') || 'N/A';
+    
+    // Create a temporary form to submit data
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'invoice.php';
+    form.style.display = 'none';
+    
+    // Add cart data
+    const cartInput = document.createElement('input');
+    cartInput.type = 'hidden';
+    cartInput.name = 'cart';
+    cartInput.value = JSON.stringify(cart);
+    form.appendChild(cartInput);
+    
+    // Add total amount
+    const totalInput = document.createElement('input');
+    totalInput.type = 'hidden';
+    totalInput.name = 'total';
+    totalInput.value = total.toFixed(2);
+    form.appendChild(totalInput);
+    
+    // Add order ID
+    const orderInput = document.createElement('input');
+    orderInput.type = 'hidden';
+    orderInput.name = 'order_id';
+    orderInput.value = orderId;
+    form.appendChild(orderInput);
+    
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
+}
+  </script>
+</body>
+</html>

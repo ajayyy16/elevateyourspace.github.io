@@ -1,0 +1,288 @@
+#products {
+    padding: 50px;
+}
+
+.product-slider {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent line breaks */
+}
+
+.product-grid {
+    display: flex; /* Use flex to keep items in a single line */
+    flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+.product-card {
+    min-width: 200px; /* Set a minimum width for each card */
+    margin: 10px; /* Space between cards */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #fff; /* White background */
+    text-align: center; /* Center text */
+    transition: transform 0.2s; /* Smooth scaling effect */
+}
+
+.product-card:hover {
+    transform: scale(1.05); /* Scale up on hover */
+}
+
+.product-card img {
+    width: 100%; /* Set the image width to 100% of the card */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px 8px 0 0; /* Rounded corners for the top */
+}
+
+.product-card h3 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.product-card p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.product-card button {
+    padding: 12px 19px;
+    margin-bottom: 10px;
+    background-color: #007bff; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.product-card button:hover {
+    background-color: #0056b3; /* Darker button color on hover */
+}
+
+.add-to-cart { 
+    background-color: #28a745; 
+    color: #fff; 
+    border: none; 
+    padding: 10px 20px; 
+    cursor: pointer; 
+    border-radius: 5px; 
+    transition: background-color 0.3s; 
+} 
+
+.add-to-cart:hover { 
+    background-color: #218838; 
+}
+
+.bestseller-section {
+    padding: 40px 20px;
+    background-color: #f9f9f9; /* Light gray background */
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  
+  .bestseller-section h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .bestseller-row {
+    display: flex;
+    justify-content: center; /* Center the row horizontally */
+    gap: 20px; /* Space between products */
+    flex-wrap: wrap; /* Allows wrapping for smaller screens */
+  }
+  
+  .bestseller-product {
+    flex: 1 1 300px; /* Ensures flexible width and responsive behavior */
+    max-width: 300px; /* Restricts the maximum width of each product */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #fff; /* White background for each product card */
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .bestseller-product img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .bestseller-details h3 {
+    font-size: 20px;
+    color: #007BFF; /* Blue heading */
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .bestseller-details p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+  
+  .bestseller-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .bestseller-add-to-cart {
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue background */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .bestseller-add-to-cart:hover {
+    background-color: #0056b3; /* Darker blue */
+    transform: scale(1.05); /* Slight zoom on hover */
+  }
+  
+  /* Responsive Styles */
+  @media screen and (max-width: 768px) {
+    .bestseller-row {
+      flex-direction: column; /* Stack products vertically on smaller screens */
+    }
+  
+    .bestseller-product {
+      max-width: 100%; /* Full width for smaller devices */
+    }
+  }
+  
+.image-gallery {
+  padding: 40px;
+  background-color: #f5f5f5; /* Light background for better contrast */
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  gap: 15px; /* Spacing between grid items */
+}
+
+.gallery-item {
+  overflow: hidden;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item img {
+  width: calc(20% * 5);
+  height: 100%;
+  object-fit: cover; /* Ensures images fit nicely */
+}
+
+.gallery-item:hover {
+  transform: scale(1.05); /* Zoom effect on hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Elevated shadow on hover */
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: 1fr 1fr; /* Two columns on smaller screens */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: 1fr; /* Single column on very small screens */
+  }
+}
+
+.services-section {
+  padding: 60px;
+  background-color: #ffffff; /* White background */
+  font-family: Arial, sans-serif;
+}
+
+.services-container {
+  display: flex;
+  align-items: stretch; /* Ensure items stretch to the same height */
+  gap: 20px; /* Increased gap for better spacing */
+}
+
+.services-discover {
+  flex: 1;
+  background-color: #0042ff; /* Blue background */
+  color: white;
+  padding: 30px; /* Increased padding for better spacing */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
+}
+
+.services-discover h2 {
+  font-size: 28px; /* Increased font size */
+  margin: 0 0 20px 0;
+}
+
+.discover-arrow {
+  background-color: white;
+  color: #0042ff;
+  width: 50px; /* Increased size for better visibility */
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px; /* Increased font size */
+  font-weight: bold;
+  margin-top: 20px; /* Added margin for spacing */
+}
+
+.services-cards {
+  flex: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px;
+}
+
+.service-card {
+  flex: 1; /* Allow cards to grow equally */
+  background-color: #f9f9f9; /* Light gray background */
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex; /* Use flexbox for better alignment */
+  flex-direction: column; /* Stack content vertically */
+  align-items: center; /* Center align items */
+}
+
+.service-card img {
+  width: 60px; /* Increased size for better visibility */
+  height: 60px; /* Increased size for better visibility */
+  margin-bottom: 15px;
+}
+
+.service-card p {
+  font-size: 16px;
+  color: #000000;
+  margin: 0;
+  flex-grow: 1; /* Allow text to grow and take available space */
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}

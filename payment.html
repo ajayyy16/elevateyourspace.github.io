@@ -1,0 +1,260 @@
+<?php
+session_start();
+
+// Database connection
+$conn = new mysqli('localhost', 'root', '', 'furniture_store');
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Validate order_id and total_amount
+if (!isset($_GET['order_id']) || !isset($_GET['total'])) {
+    die("Invalid request. Order ID and total amount are required.");
+}
+
+$order_id = htmlspecialchars($_GET['order_id']);
+$total_amount = htmlspecialchars($_GET['total']);
+
+// Store order details in session for later use
+$_SESSION['order_id'] = $order_id;
+$_SESSION['total_amount'] = $total_amount;
+
+// Save cart from POST if available
+if (isset($_POST['products'])) {
+    $_SESSION['cart'] = $_POST['products']; // Store the cart in session
+} else {
+    $_SESSION['cart'] = [];
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      border-radius: 8px;
+    }
+    h2 { font-size: 24px; color: #333; margin-bottom: 15px; }
+    #total-amount { font-size: 20px; font-weight: bold; color: #28a745; margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-group input, select { width: 95%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 5px; }
+    .expiry-date-group { display: flex; gap: 10px; }
+    button {
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover { background: #0056b3; transform: translateY(-2px); }
+    #qr-code { display: none; margin-top: 15px; }
+    /* Processing Bar Styling */
+    #processing-bar {
+      display: none;
+      margin-top: 15px;
+      padding: 10px;
+      background: #ffc107;
+      color: #333;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    @media screen and (max-width: 480px) {
+      .container { width: 90%; padding: 15px; }
+    }
+  </style>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Payment Details</h2>
+    <p>Total Amount: ₹ <span id="total-amount"><?= $total_amount ?></span></p>
+
+    <form id="paymentForm" action="process_payment.php" method="POST">
+      <input type="hidden" name="order_id" value="<?= $order_id ?>">
+      <input type="hidden" name="total_amount" value="<?= $total_amount ?>">
+
+      <!-- Payment Method Selection -->
+      <div class="form-group">
+        <label for="payment-type">Select Payment Method:</label>
+        <select id="payment-type" name="payment_method" required>
+          <option value="credit-card" selected>Credit Card</option>
+          <option value="upi">UPI</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+      </div>
+
+      <!-- Credit Card Fields (Default) -->
+      <div id="credit-card-fields">
+        <div class="form-group">
+          <label for="card-number">Card Number</label>
+          <input type="text" id="card-number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="16">
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <div class="expiry-date-group">
+            <select id="expiry-month" name="expiry_month">
+              <option value="" disabled selected>Month</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+            <select id="expiry-year" name="expiry_year">
+              <option value="" disabled selected>Year</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+              <option value="2031">2031</option>
+              <option value="2032">2032</option>
+              <option value="2033">2033</option>
+              <option value="2034">2034</option>
+              <option value="2035">2035</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3">
+        </div>
+      </div>
+
+      <!-- UPI Fields -->
+      <div id="upi-fields" style="display: none;">
+        <label for="upi-option">Select UPI Option:</label>
+        <select id="upi-option" name="upi_option">
+          <option value="upi-id">UPI ID</option>
+          <option value="qr-code">QR Code</option>
+        </select>
+        <div id="upi-id-field" class="form-group" style="display: none;">
+          <label for="upi-id">Enter UPI ID</label>
+          <input type="text" id="upi-id" name="upi_id" placeholder="example@upi">
+        </div>
+        <div id="qr-code" class="form-group" style="display: none;">
+          <label>Scan QR Code</label>
+          <div id="qr-code-display"></div>
+        </div>
+      </div>
+
+      <!-- Cash on Delivery Fields -->
+      <div id="cod-fields" style="display: none;">
+        <p><strong>Cash on Delivery</strong> selected. Ensure you have the exact amount ready.</p>
+      </div>
+
+      <button type="submit" id="submit-btn">Proceed</button>
+    </form>
+  </div>
+
+  <script>
+    // Toggle payment method fields based on selection
+    document.getElementById("credit-card-fields").style.display = "block";
+    document.getElementById("payment-type").addEventListener("change", function () {
+      document.getElementById("credit-card-fields").style.display = "none";
+      document.getElementById("upi-fields").style.display = "none";
+      document.getElementById("cod-fields").style.display = "none";
+      if (this.value === "credit-card") {
+        document.getElementById("credit-card-fields").style.display = "block";
+      } else if (this.value === "upi") {
+        document.getElementById("upi-fields").style.display = "block";
+      } else if (this.value === "cod") {
+        document.getElementById("cod-fields").style.display = "block";
+      }
+    });
+
+    // Toggle UPI input fields based on UPI option selection
+    document.getElementById("upi-option").addEventListener("change", function () {
+      document.getElementById("upi-id-field").style.display = "none";
+      document.getElementById("qr-code").style.display = "none";
+      if (this.value === "upi-id") {
+        document.getElementById("upi-id-field").style.display = "block";
+      } else if (this.value === "qr-code") {
+        document.getElementById("qr-code").style.display = "block";
+        document.getElementById("qr-code-display").innerHTML = "";
+        new QRCode(document.getElementById("qr-code-display"), {
+          text: `upi://pay?pa=yourupi@bank&am=<?= $total_amount ?>&cu=INR`,
+          width: 200,
+          height: 200
+        });
+      }
+    });
+
+    // Client-side form validation and processing delay
+    document.getElementById("paymentForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent immediate submission
+
+      var paymentMethod = document.getElementById("payment-type").value;
+      
+      if (paymentMethod === "credit-card") {
+        var cardNumber = document.getElementById("card-number").value.trim();
+        var expiryMonth = document.getElementById("expiry-month").value;
+        var expiryYear = document.getElementById("expiry-year").value;
+        var cvv = document.getElementById("cvv").value.trim();
+        if (!cardNumber || cardNumber.length < 12) {
+          alert("Please enter a valid card number.");
+          return;
+        }
+        if (!expiryMonth || !expiryYear) {
+          alert("Please select a valid expiry date.");
+          return;
+        }
+        if (!cvv || cvv.length < 3) {
+          alert("Please enter a valid CVV.");
+          return;
+        }
+      } else if (paymentMethod === "upi") {
+        var upiOption = document.getElementById("upi-option").value;
+        if (upiOption === "upi-id") {
+          var upiId = document.getElementById("upi-id").value.trim();
+          if (!upiId) {
+            alert("Please enter a valid UPI ID.");
+            return;
+          }
+        }
+      }
+      document.getElementById("submit-btn").textContent = "Processing, please wait...";
+document.getElementById("submit-btn").disabled = true;
+
+// Calculate a random delay between 5000 and 8000 milliseconds
+const delay = Math.floor(Math.random() * (8000 - 5000 + 1)) + 5000;
+
+      setTimeout(function() {
+        document.getElementById("paymentForm").submit();
+      }, delay);
+    });
+  </script>
+</body>
+</html>

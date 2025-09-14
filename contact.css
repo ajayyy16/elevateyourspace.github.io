@@ -1,0 +1,109 @@
+/* Contact Section Styling */
+.contact-section {
+    background-image: url('https://t4.ftcdn.net/jpg/08/78/08/29/240_F_878082995_uOPXK78xcoPwnpQbECmMnzd3cENHG6ib.jpg'); /* Path to your background image */
+    background-size: cover;
+    background-position: center;
+    color: #333;
+    padding: 100px 10px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;/* White background with opacity */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .contact-info {
+    flex: 0.5;
+    padding: 40px;
+    background-color: #007BFF; /* Blue background */
+    color: white;
+  }
+  
+  .contact-info h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  
+  .contact-info p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .contact-info ul {
+    list-style: none;
+    padding: 0;  
+}
+  
+  .contact-info ul li {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  .contact-info ul li i {
+    margin-right: 1px;
+    color: #FFD700; /* Golden icon color */
+  }
+  
+  .contact-form {
+    flex: 1;
+    padding: 40px;
+  }
+  
+  .contact-form h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    margin-right: 10px;
+    padding: 10px 16px;
+    font-size: 16px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: auto;
+    border-color: #007BFF;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.5);
+  }
+  
+  .contact-btn {
+    padding: 12px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .contact-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+  }
+  
